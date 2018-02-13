@@ -77,6 +77,7 @@ public class RandomSequence : MonoBehaviour
 					foreach (var light in lights) {
 						light.SetActive (false);
 					}
+                    gameOver = true;
 					break;
 				}
 				time = time + Time.deltaTime;
