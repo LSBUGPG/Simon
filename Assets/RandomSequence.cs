@@ -35,9 +35,9 @@ public class RandomSequence : MonoBehaviour
 			yield return new WaitForSeconds (0.5f);
 		}
 
-		buttonPressed = 4;
 		foreach (var item in sequence) {
 
+			buttonPressed = 4;
 			float time = 0.0f;
 			while (time < 1.0f) {
 
@@ -81,9 +81,6 @@ public class RandomSequence : MonoBehaviour
 				}
 				break;
 			}
-
-
-
 
 			yield return new WaitForSeconds (1.0f);
 		}
