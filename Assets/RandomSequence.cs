@@ -9,18 +9,33 @@ public class RandomSequence : MonoBehaviour
 	public GameObject[] lights;
 	AudioSource source;
 	int buttonPressed;
+	bool gameOver = false;
 
 	void Start ()
 	{
 		source = GetComponent<AudioSource> ();
 
-		var sequence = CreateSequence (1);
-		StartCoroutine (PlaySequence (sequence));
+		StartCoroutine (PlayGame());
 	}
 
 	public void DetectButton(int button)
 	{
 		buttonPressed = button;
+	}
+
+	IEnumerator PlayGame()
+	{
+		var sequence = CreateSequence (1);
+		while (true) 
+		{
+			yield return StartCoroutine (PlaySequence (sequence));
+			if (gameOver) {
+				break;
+			} else {
+				yield return new WaitForSeconds (1.0f);
+				sequence = ExtendSequence(sequence);
+			}
+		}
 	}
 
 	IEnumerator PlaySequence(List<int> sequence)
@@ -47,7 +62,7 @@ public class RandomSequence : MonoBehaviour
 					source.pitch = 0.8f + 0.1f * (float)item;
 					source.Play ();
 					lights[item].SetActive(true);
-					yield return new WaitForSeconds (1.0f);
+					yield return new WaitForSeconds (0.5f);
 					lights[item].SetActive(false);
 					break;
 				}
@@ -58,7 +73,7 @@ public class RandomSequence : MonoBehaviour
 					}
 					source.clip = buzz;
 					source.Play ();
-					yield return new WaitForSeconds (1.0f);
+					yield return new WaitForSeconds (0.5f);
 					foreach (var light in lights) {
 						light.SetActive (false);
 					}
@@ -79,11 +94,16 @@ public class RandomSequence : MonoBehaviour
 				foreach (var light in lights) {
 					light.SetActive (false);
 				}
+				gameOver = true;
 				break;
 			}
-
-			yield return new WaitForSeconds (1.0f);
 		}
+	}
+
+	List<int> ExtendSequence(List<int> list)
+	{
+		list.Add(Random.Range (0, 4));
+		return list;
 	}
 
 	List<int> CreateSequence(int n)
