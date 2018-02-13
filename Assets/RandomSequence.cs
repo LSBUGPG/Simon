@@ -17,6 +17,11 @@ public class RandomSequence : MonoBehaviour
 		StartCoroutine (PlaySequence (sequence));
 	}
 
+	public void DetectButton(int button)
+	{
+		Debug.Log (button);
+	}
+
 	IEnumerator PlaySequence(List<int> sequence)
 	{
 		foreach (var item in sequence) {
