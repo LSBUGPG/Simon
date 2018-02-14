@@ -38,16 +38,36 @@ public class RandomSequence : MonoBehaviour
 		}
 	}
 
+    IEnumerator Light(int number)
+    {
+        source.clip = tone;
+        source.pitch = 0.8f + 0.1f * (float)number;
+        source.Play ();
+        lights [number].SetActive (true);
+        yield return new WaitForSeconds (0.5f);
+        lights [number].SetActive (false);
+    }
+
+    IEnumerator Buzz()
+    {
+        foreach (var light in lights) {
+            light.SetActive (true);
+        }
+        source.pitch = 1.0f;
+        source.clip = buzz;
+        source.Play ();
+        yield return new WaitForSeconds (0.5f);
+        foreach (var light in lights) {
+            light.SetActive (false);
+        }
+        gameOver = true;
+    }
+
 	IEnumerator PlaySequence(List<int> sequence)
 	{
 		foreach (var item in sequence) {
-			source.clip = tone;
-			source.pitch = 0.8f + 0.1f * (float)item;
-			source.Play ();
-			lights [item].SetActive (true);
-			yield return new WaitForSeconds (0.5f);
-			lights [item].SetActive (false);
-			yield return new WaitForSeconds (0.5f);
+            yield return StartCoroutine(Light(item));
+            yield return new WaitForSeconds (0.5f);
 		}
 
 		foreach (var item in sequence) {
@@ -56,46 +76,23 @@ public class RandomSequence : MonoBehaviour
 			float time = 0.0f;
 			while (time < 1.0f) {
 
+                time = time + Time.deltaTime;
+                yield return null;
 				if (item == buttonPressed) {
 					// correct answer
-					source.clip = tone;
-					source.pitch = 0.8f + 0.1f * (float)item;
-					source.Play ();
-					lights[item].SetActive(true);
-					yield return new WaitForSeconds (0.5f);
-					lights[item].SetActive(false);
+                    yield return StartCoroutine(Light(item));
 					break;
 				}
 				else if (item != buttonPressed && buttonPressed != 4) {
 					// wrong answer...
-					foreach (var light in lights) {
-						light.SetActive (true);
-					}
-					source.clip = buzz;
-					source.Play ();
-					yield return new WaitForSeconds (0.5f);
-					foreach (var light in lights) {
-						light.SetActive (false);
-					}
-                    gameOver = true;
-					break;
+                    yield return StartCoroutine(Buzz());
+					yield break;
 				}
-				time = time + Time.deltaTime;
-				yield return null;
 			}
 
 			if (buttonPressed == 4) {
 				// too late...
-				foreach (var light in lights) {
-					light.SetActive (true);
-				}
-				source.clip = buzz;
-				source.Play ();
-				yield return new WaitForSeconds (1.0f);
-				foreach (var light in lights) {
-					light.SetActive (false);
-				}
-				gameOver = true;
+                yield return StartCoroutine(Buzz());
 				break;
 			}
 		}
@@ -115,10 +112,5 @@ public class RandomSequence : MonoBehaviour
 		}
 
 		return sequence;
-	}
-
-	void Update ()
-	{
-		
 	}
 }
